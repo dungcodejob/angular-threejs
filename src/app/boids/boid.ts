@@ -2,9 +2,9 @@ export class Boid {
   static MAX_SPEED = 4;
   static NEIGHBOR_DISTANCE = 50;
   static SEPARATION_DISTANCE = 20;
-  static ALIGNMENT_FACTOR = 0.05;
-  static COHESION_FACTOR = 0.01;
-  static SEPARATION_FACTOR = 0.1;
+  static ALIGNMENT_FACTOR = 0.1;
+  static COHESION_FACTOR = 0.05;
+  static SEPARATION_FACTOR = 0.15;
 
   x: number;
   y: number;
