@@ -4,6 +4,19 @@
   </div>
 
   <div class="flex gap-10">
+    <div>
+      @for(shape of shapeOptions; track $index) {
+        <input
+          type="radio"
+          [id]="shape.value"
+          [name]="shape.value"
+          [value]="shape.value"
+          [(ngModel)]="$shape"
+        />
+        <label for="bounceOffWalls">{{ shape.label }} </label><br />
+      }
+    </div>
+
     <div class="flex flex-col">
       <label for="">Alignment Range {{ $alignmentRange() }}</label>
       <input type="range" min="0" max="200" [(ngModel)]="$alignmentRange" />

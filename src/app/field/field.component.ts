@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Vector2 } from '@shared/models';
-import { Boid } from './boid';
+import { Boid, Shape, shapeOptions } from './boid';
 
 enum WrapType {
   BounceOffWalls = 'bounceOffWalls',
@@ -27,6 +27,8 @@ export class FieldComponent implements OnInit {
   $canvas: Signal<ElementRef<HTMLCanvasElement>> = viewChild.required('canvas');
   $context = computed(() => this.$canvas().nativeElement.getContext('2d')!);
 
+  shapeOptions = shapeOptions;
+
   private boids: Boid[] = [];
 
   private width = (window.innerWidth * 3) / 4;
@@ -42,12 +44,13 @@ export class FieldComponent implements OnInit {
   cohesionFactor = 0.0003;
 
   paddingRange = 50;
-  turnFactor = 0.2;
 
   maxSpeed = 3;
   minSpeed = 1;
+  turnFactor = (this.maxSpeed - this.minSpeed) / 20;
 
   $wrapType = model(WrapType.BounceOffWalls);
+  $shape = model(Shape.Circle);
 
   ngOnInit(): void {
     this.setupCanvas();
@@ -68,8 +71,8 @@ export class FieldComponent implements OnInit {
         Math.random() * this.height
       );
       const velocity = new Vector2(
-        Math.random() * 2 - 1,
-        Math.random() * 2 - 1
+        Math.random() * (this.maxSpeed - this.minSpeed) + this.minSpeed,
+        Math.random() * (this.maxSpeed - this.minSpeed) + this.minSpeed
       );
       const boid = new Boid(i.toString(), position, velocity);
       this.boids.push(boid);
@@ -94,16 +97,16 @@ export class FieldComponent implements OnInit {
 
       this._limitSpeed(boid);
 
-      if(this.$wrapType() === WrapType.BounceOffWalls) {
-         const turnVelocity = this._bounceOffWalls(boid);
-         boid.velocity.add(turnVelocity);
+      if (this.$wrapType() === WrapType.BounceOffWalls) {
+        const turnVelocity = this._bounceOffWalls(boid);
+        boid.velocity.add(turnVelocity);
       }
 
       if (this.$wrapType() === WrapType.WrapAroundEdges) {
         this._wrapAround(boid);
       }
 
-      boid.draw(ctx);
+      boid.draw(ctx, this.$shape());
     }
 
     requestAnimationFrame(() => this.animate());
