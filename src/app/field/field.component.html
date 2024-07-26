@@ -18,5 +18,29 @@
       <label for="">Separation Range {{ $separationRange() }}</label>
       <input type="range" min="0" max="200" [(ngModel)]="$separationRange" />
     </div>
+
+    <div class="flex flex-col">
+      <label for="">Separation Range {{ $separationRange() }}</label>
+      <input type="range" min="0" max="200" [(ngModel)]="$separationRange" />
+    </div>
+
+    <div>
+      <input
+        type="radio"
+        id="bounceOffWalls"
+        name="bounceOffWalls"
+        value="bounceOffWalls"
+        [(ngModel)]="$wrapType"
+      />
+        <label for="bounceOffWalls">Bounce Off Walls </label><br />
+      <input
+        type="radio"
+        id="wrapAroundEdges"
+        name="wrapAroundEdges"
+        value="wrapAroundEdges"
+        [(ngModel)]="$wrapType"
+      />
+        <label for="wrapAroundEdges">Wrap Around Edges </label><br />
+    </div>
   </div>
 </div>

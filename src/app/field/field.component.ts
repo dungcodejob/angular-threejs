@@ -11,6 +11,11 @@ import { FormsModule } from '@angular/forms';
 import { Vector2 } from '@shared/models';
 import { Boid } from './boid';
 
+enum WrapType {
+  BounceOffWalls = 'bounceOffWalls',
+  WrapAroundEdges = 'wrapAroundEdges',
+}
+
 @Component({
   selector: 'app-field',
   standalone: true,
@@ -41,6 +46,8 @@ export class FieldComponent implements OnInit {
 
   maxSpeed = 3;
   minSpeed = 1;
+
+  $wrapType = model(WrapType.BounceOffWalls);
 
   ngOnInit(): void {
     this.setupCanvas();
@@ -85,21 +92,16 @@ export class FieldComponent implements OnInit {
 
       boid.position.add(boid.velocity);
 
-      let speed = boid.velocity.magnitude();
-      if (speed > this.maxSpeed) {
-        boid.velocity = boid.velocity
-          .divideScalar(speed)
-          .multiplyScalar(this.maxSpeed);
+      this._limitSpeed(boid);
+
+      if(this.$wrapType() === WrapType.BounceOffWalls) {
+         const turnVelocity = this._bounceOffWalls(boid);
+         boid.velocity.add(turnVelocity);
       }
 
-      if (speed < this.minSpeed) {
-        boid.velocity = boid.velocity
-          .divideScalar(speed)
-          .multiplyScalar(this.minSpeed);
+      if (this.$wrapType() === WrapType.WrapAroundEdges) {
+        this._wrapAround(boid);
       }
-
-      const turnVelocity = this._bounceOffWalls(boid);
-      boid.velocity.add(turnVelocity);
 
       boid.draw(ctx);
     }
@@ -200,5 +202,27 @@ export class FieldComponent implements OnInit {
     }
 
     return turnVelocity;
+  }
+
+  private _limitSpeed(boid: Boid) {
+    let speed = boid.velocity.magnitude();
+    if (speed > this.maxSpeed) {
+      boid.velocity = boid.velocity
+        .divideScalar(speed)
+        .multiplyScalar(this.maxSpeed);
+    }
+
+    if (speed < this.minSpeed) {
+      boid.velocity = boid.velocity
+        .divideScalar(speed)
+        .multiplyScalar(this.minSpeed);
+    }
+  }
+
+  private _wrapAround(boid: Boid) {
+    if (boid.position.x < 0) boid.position.x += this.width;
+    if (boid.position.x > this.width) boid.position.x -= this.width;
+    if (boid.position.y < 0) boid.position.y += this.height;
+    if (boid.position.y > this.height) boid.position.y -= this.height;
   }
 }
