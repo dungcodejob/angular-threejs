@@ -1,0 +1,22 @@
+<div class="w-screen h-screen flex flex-col items-center justify-center gap-4">
+  <div class="border rounded-md">
+    <canvas #canvas></canvas>
+  </div>
+
+  <div class="flex gap-10">
+    <div class="flex flex-col">
+      <label for="">Alignment Range {{ $alignmentRange() }}</label>
+      <input type="range" min="0" max="200" [(ngModel)]="$alignmentRange" />
+    </div>
+
+    <div class="flex flex-col">
+      <label for="">Cohesion Range {{ $cohesionRange() }}</label>
+      <input type="range" min="0" max="200" [(ngModel)]="$cohesionRange" />
+    </div>
+
+    <div class="flex flex-col">
+      <label for="">Separation Range {{ $separationRange() }}</label>
+      <input type="range" min="0" max="200" [(ngModel)]="$separationRange" />
+    </div>
+  </div>
+</div>

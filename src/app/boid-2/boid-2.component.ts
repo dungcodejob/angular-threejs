@@ -23,8 +23,8 @@ interface Boid {
 export class Boid2Component implements OnInit {
   private readonly visualRange = 80;
   private readonly protectedRange = 8;
-  private readonly maxSpeed = 10;
-  private readonly minSpeed = 3;
+  private readonly maxSpeed = 3;
+  private readonly minSpeed = 1;
   private readonly avoidFactor = 0.1;
   private readonly matchingFactor = 0.01;
   private readonly centeringFactor = 0.0005;
@@ -32,8 +32,8 @@ export class Boid2Component implements OnInit {
 
   $canvas: Signal<ElementRef<HTMLCanvasElement>> = viewChild.required('canvas');
   private context!: CanvasRenderingContext2D;
-  private readonly width: number = window.innerWidth /2;
-  private readonly height: number = window.innerHeight/2;
+  private readonly width: number = window.innerWidth / 2;
+  private readonly height: number = window.innerHeight / 2;
 
   private readonly boids: Boid[] = [];
 
@@ -77,9 +77,7 @@ export class Boid2Component implements OnInit {
 
       boid.vx += separation.x + alignment.x + cohesion.x;
       boid.vx += separation.y + alignment.y + cohesion.y;
-    }
 
-    for (const boid of this.boids) {
       if (boid.x > this.width - 100) {
         boid.vx += -this.turnFactor;
       }
