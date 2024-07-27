@@ -38,11 +38,16 @@ export class Boid {
    * @param {Shape} [shape=Shape.Circle] - The shape to draw on the canvas. Defaults to Circle.
    * @return {void} This function does not return anything.
    */
-  draw(ctx: CanvasRenderingContext2D, shape = Shape.Circle): void {
+  draw(
+    ctx: CanvasRenderingContext2D,
+    shape = Shape.Circle,
+    Color = 'black'
+  ): void {
     // Draws a circle representing the boid on the canvas.
     if (shape === Shape.Circle) {
       ctx.beginPath();
       ctx.arc(this.position.x, this.position.y, 3, 0, 2 * Math.PI);
+      ctx.fillStyle = Color;
       ctx.fill();
       ctx.closePath();
     }
@@ -66,8 +71,9 @@ export class Boid {
         this.position.x + Math.cos(angle - (2 * Math.PI) / 3) * edge,
         this.position.y + Math.sin(angle - (2 * Math.PI) / 3) * edge
       );
-      ctx.closePath();
+      ctx.fillStyle = Color;
       ctx.fill();
+      ctx.closePath();
     }
   }
 }

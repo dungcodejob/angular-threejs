@@ -1,14 +1,18 @@
 import {
   Component,
   computed,
+  DestroyRef,
   ElementRef,
+  inject,
   model,
   OnInit,
   Signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Vector2 } from '@shared/models';
+import { fromEvent, merge, tap } from 'rxjs';
 import { Boid, Shape, shapeOptions } from './boid';
 
 enum WrapType {
@@ -24,12 +28,15 @@ enum WrapType {
   styleUrl: './field.component.css',
 })
 export class FieldComponent implements OnInit {
+  private readonly _destroyRef = inject(DestroyRef);
+
   $canvas: Signal<ElementRef<HTMLCanvasElement>> = viewChild.required('canvas');
   $context = computed(() => this.$canvas().nativeElement.getContext('2d')!);
 
   shapeOptions = shapeOptions;
 
   private boids: Boid[] = [];
+  private predators: Boid[] = [];
 
   private width = (window.innerWidth * 3) / 4;
   private height: number = (window.innerHeight * 3) / 4;
@@ -43,6 +50,9 @@ export class FieldComponent implements OnInit {
   $cohesionRange = model(50);
   cohesionFactor = 0.0003;
 
+  $predatorRange = model(150);
+  predatorFactor = 0.0007;
+
   paddingRange = 50;
 
   maxSpeed = 3;
@@ -51,11 +61,30 @@ export class FieldComponent implements OnInit {
 
   $wrapType = model(WrapType.BounceOffWalls);
   $shape = model(Shape.Circle);
+  $mousePosition = model({ x: 0, y: 0 });
 
   ngOnInit(): void {
+    //TODO: thiết lập kẻ săn mồi
     this.setupCanvas();
+    this.trackMousePosition();
     this.initializeFlock();
     this.animate();
+  }
+
+  private trackMousePosition(): void {
+    const canvas = this.$canvas().nativeElement;
+    const rect = canvas.getBoundingClientRect();
+    merge(fromEvent(canvas, 'mousemove'), fromEvent(canvas, 'mousemove'))
+      .pipe(
+        tap((e) => {
+          const event = e as MouseEvent;
+          const x = event.clientX - rect.left;
+          const y = event.clientY - rect.top;
+          this.$mousePosition.set({ x, y });
+        }),
+        takeUntilDestroyed(this._destroyRef)
+      )
+      .subscribe();
   }
 
   private setupCanvas(): void {
@@ -77,6 +106,19 @@ export class FieldComponent implements OnInit {
       const boid = new Boid(i.toString(), position, velocity);
       this.boids.push(boid);
     }
+
+    // for (let i = 0; i < 3; i++) {
+    //   const position = new Vector2(
+    //     Math.random() * this.width,
+    //     Math.random() * this.height
+    //   );
+    //   const velocity = new Vector2(
+    //     Math.random() * (this.maxSpeed - this.minSpeed) + this.minSpeed,
+    //     Math.random() * (this.maxSpeed - this.minSpeed) + this.minSpeed
+    //   );
+    //   const boid = new Boid(i.toString(), position, velocity);
+    //   this.predators.push(boid);
+    // }
   }
 
   private animate(): void {
@@ -87,11 +129,13 @@ export class FieldComponent implements OnInit {
       const separationVelocity = this._separation(boid);
       const alignmentVelocity = this._alignment(boid);
       const cohesionVelocity = this._cohesion(boid);
+      const predatorVelocity = this._predator(boid);
 
       boid.velocity
         .add(separationVelocity)
         .add(alignmentVelocity)
-        .add(cohesionVelocity);
+        .add(cohesionVelocity)
+        .add(predatorVelocity);
 
       boid.position.add(boid.velocity);
 
@@ -107,6 +151,23 @@ export class FieldComponent implements OnInit {
       }
 
       boid.draw(ctx, this.$shape());
+    }
+
+    for (const predator of this.predators) {
+      predator.position.add(predator.velocity);
+
+      this._limitSpeed(predator);
+      predator.velocity.multiplyScalar(0.75);
+
+      if (this.$wrapType() === WrapType.BounceOffWalls) {
+        const turnVelocity = this._bounceOffWalls(predator);
+        predator.velocity.add(turnVelocity);
+      }
+
+      if (this.$wrapType() === WrapType.WrapAroundEdges) {
+        this._wrapAround(predator);
+      }
+      predator.draw(ctx, this.$shape(), 'red');
     }
 
     requestAnimationFrame(() => this.animate());
@@ -184,6 +245,34 @@ export class FieldComponent implements OnInit {
     }
 
     return cohesionVelocity;
+  }
+
+  private _predator(currentBoid: Boid): Vector2 {
+    let predatorVelocity = new Vector2(0, 0);
+
+    for (let predator of this.predators) {
+      let distance = currentBoid.position.distanceTo(predator.position);
+      if (distance < this.$predatorRange()) {
+        predatorVelocity.add(
+          new Vector2(
+            currentBoid.position.x - predator.position.x,
+            currentBoid.position.y - predator.position.y
+          )
+        );
+      }
+    }
+    const { x, y } = this.$mousePosition();
+    let distanceMouse = currentBoid.position.distanceTo(new Vector2(x, y));
+
+    if (distanceMouse < this.$predatorRange()) {
+      predatorVelocity.add(
+        new Vector2(currentBoid.position.x - x, currentBoid.position.y - y)
+      );
+    }
+
+    predatorVelocity.multiplyScalar(this.predatorFactor);
+
+    return predatorVelocity;
   }
 
   private _bounceOffWalls(currentBoid: Boid): Vector2 {
