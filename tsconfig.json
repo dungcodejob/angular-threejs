@@ -3,19 +3,23 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/out-tsc",
     "baseUrl": "./",
     "paths": {
-      "@shared/*": ["src/app/shared/*"],
       "@core/*": ["src/app/core/*"],
-      "@play/*": ["src/app/play/*"]
+      "@shared/*": ["src/app/shared/*"],
+      "@security/*": ["src/app/security/*"],
+      "@collection/*": ["src/app/collection/*"],
+      "@bookmark/*": ["src/app/bookmark/*"],
+      "@home/*": ["src/app/home/*"]
     },
+    "outDir": "./dist/out-tsc",
     "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
+    "isolatedModules": true,
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": false,
@@ -24,7 +28,6 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "ES2022",
-    "useDefineForClassFields": false,
     "lib": ["ES2022", "dom"]
   },
   "angularCompilerOptions": {

@@ -2,8 +2,13 @@
 module.exports = {
   content: ["./src/**/*.{html,ts}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: "hsl(var(--primary))",
+        "primary-foreground": "hsl(var(--primary-foreground))",
+        "muted-foreground": "hsl(var(--muted-foreground))",
+      },
+    },
   },
   plugins: [],
 };
-

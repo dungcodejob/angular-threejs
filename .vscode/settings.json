@@ -1,6 +1,7 @@
 {
-    "cSpell.words": [
-        "Boid",
-        "boids"
-    ]
+    "angular-schematics.schematicsDefaultOptions": {
+        "angular-*": {
+            "externalTemplate": true
+        }
+    }
 }

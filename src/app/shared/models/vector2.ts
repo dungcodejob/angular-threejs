@@ -7,6 +7,10 @@ export class Vector2 {
     this.y = y;
   }
 
+  static zero(): Vector2 {
+    return new Vector2(0, 0);
+  }
+
   // Add another vector to the current vector
   add(vector: Vector2): this {
     this.x += vector.x;
@@ -52,7 +56,7 @@ export class Vector2 {
   // Divide the current vector by a scalar
   divideScalar(scalar: number): this {
     if (scalar === 0) {
-      throw new Error('Division by zero is not allowed');
+      throw new Error("Division by zero is not allowed");
     }
     this.x /= scalar;
     this.y /= scalar;
