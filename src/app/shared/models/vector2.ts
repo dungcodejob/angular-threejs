@@ -86,6 +86,10 @@ export class Vector2 {
     return this.x * vector.x + this.y * vector.y;
   }
 
+  angle(): number {
+    return Math.atan2(this.y, this.x);
+  }
+
   // Calculate the angle between two vectors (returns in radians)
   angleTo(vector: Vector2): number {
     const dotProd = this.dot(vector);

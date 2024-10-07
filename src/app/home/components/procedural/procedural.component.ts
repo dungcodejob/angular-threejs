@@ -103,7 +103,7 @@ export class ProceduralComponent implements OnInit, AfterViewInit {
     const y = this.$canvas().nativeElement.height / 2;
 
     const origin = new Joint(new Vector2(x, y));
-    this.chain = new Chain(origin, 12, 50);
+    this.chain = new Chain(origin, 12, 50, Math.PI / 8);
   }
 
   private animate(): void {
