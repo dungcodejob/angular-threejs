@@ -4,6 +4,11 @@ import { Joint } from "./joint";
 
 export class Chain {
   private readonly _joints: Joint[] = [];
+
+  get joints() {
+    return this._joints;
+  }
+
   private _size: number;
   private _maxAngle: number; // Max angle difference between adjacent joints
   constructor(origin: Joint, count: number, size: number, maxAngle: number) {
@@ -38,13 +43,13 @@ export class Chain {
         .subtract(currentJoint.position)
         .angle();
 
-      angle = this._limitAngle(angle, prevJoint.angle);
+      // angle = this._limitAngle(angle, prevJoint.angle);
 
-      currentJoint.angle = angle;
+      // currentJoint.angle = angle;
 
       const distance = currentJoint.position.distanceTo(prevJoint.position);
 
-      currentJoint.position.subtract(this._fromAngle(angle).multiplyScalar(this._size));
+      // currentJoint.position.subtract(this._fromAngle(angle).multiplyScalar(this._size));
 
       if (distance > this._size) {
         currentJoint.position.add(
